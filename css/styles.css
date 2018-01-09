@@ -1,0 +1,41 @@
+body{
+  background-color: #C6D6A6;
+}
+h1{
+  font-family: 'Macondo Swash Caps';
+  text-align: center;
+  font-size: 7em;
+  color: #621B1B;
+}
+#main-note{
+  text-align: center;
+  font-size: 1.25em;
+  font-family: "Cairo";
+}
+#login-form{
+  width: 25%;
+  margin-left: 37.5%;
+  font-size: 2em;
+  font-family: 'Cairo';
+  color: #621B1B;
+  text-align: center;
+  line-height: 90%;
+}
+#login-form input[type="text"]{
+  font-size: .5em;
+  height: 2em;
+  width: 50%;
+}
+#login-form input[type="password"]{
+  font-size: .5em;
+  height: 2em;
+  width: 50%;
+}
+#login-form input[type="submit"]{
+  width: 50%;
+  text-align: center;
+  font-size: 1em;
+  font-family: 'Cairo';
+  background-color: #9BAF73;
+  color: #621B1B;
+}

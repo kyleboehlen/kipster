@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Kipster</title>
+		<link href="css/styles.css" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css?family=Cairo|Macondo+Swash+Caps" rel="stylesheet">
+		<link href="stylesheets/animate.css" rel="stylesheet" />
+		<link href="media/connection.png" rel="icon" />
+		<!--http://paletton.com/#uid=3000u0kefjl7asMb5nzi1e+n5cg-->
+		<script>
+
+		</script>
+	</head>
+	<body>
+		[onshow;block=begin; when [var.navbar] == 1]
+			<navbar>
+			</navbar>
+		[onshow;block=end;]
+		<h1>Kipster</h1>
+		<p id="main-note">[onshow.note]</p>
+    [onshow;block=begin; when [var.login] == 1]
+      <form id="login-form" action="index.php" method="post">
+        Username:<br /><input type="text" name="username" value="[onshow.username_value]"/><br />
+        Password:<br /><input type="password" name="password" /><br />
+				[onshow;block=begin; when [var.confirm_password] == 1]
+        	Confirm Password:<br /><input type="password" name="confirm-password" /><br />
+				[onshow;block=end;]
+        <br /><input type="submit" name="Login" value="Login" />
+      </form>
+    [onshow;block=end;]
+
+	</body>
+</html>
