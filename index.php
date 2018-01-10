@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 //start session and set cookie lenth to 1 week
+ini_set('session.gc_maxlifetime', 604800);
 session_set_cookie_params(604800);
 session_start();
 
@@ -19,6 +20,7 @@ $username_value = '';
 $login = false;
 $confirm_password = false;
 $navbar = false;
+$logo = false;
 
 //declare tbs object and template
 $tbs = new clsTinyButStrong;
@@ -92,6 +94,27 @@ if(!isset($_SESSION['username'])){
     $tbs->Show();
     exit();
   }
+}
+
+$navbar = true;
+
+if(isset($_GET['request'])){
+  $request = $_GET['request'];
+}
+
+switch($request){
+  case "das":
+    break;
+  case "peoples"
+    break;
+  case "logout":
+    session_unset();
+    session_destroy();
+    header('Location: index.php');
+    break;
+  default:
+    $logo = true;
+    break;
 }
 
 $tbs->Show();

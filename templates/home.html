@@ -14,10 +14,18 @@
 	<body>
 		[onshow;block=begin; when [var.navbar] == 1]
 			<navbar>
+				<ul>
+					<li><a href="index.php">Home</a></li>
+					<li><a href="index.php?request=das">Devices and Sites</a></li>
+					<li><a href="index.php?request=peoples">Peoples</a></li>
+					<li><a href="index.php?request=logout">Log Out</a></li>
+				</ul>
 			</navbar>
 		[onshow;block=end;]
+
 		<h1>Kipster</h1>
 		<p id="main-note">[onshow.note]</p>
+
     [onshow;block=begin; when [var.login] == 1]
       <form id="login-form" action="index.php" method="post">
         Username:<br /><input type="text" name="username" value="[onshow.username_value]"/><br />
@@ -28,6 +36,11 @@
         <br /><input type="submit" name="Login" value="Login" />
       </form>
     [onshow;block=end;]
+
+		[onshow;block=begin; when [var.logo] == 1]
+			<img id="logo" src="media/connection.png" />
+		[onshow;block=end;]
+
 
 	</body>
 </html>
