@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 09, 2018 at 04:27 PM
+-- Generation Time: Jan 10, 2018 at 01:00 PM
 -- Server version: 5.5.58-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.22
 
@@ -84,8 +84,38 @@ CREATE TABLE IF NOT EXISTS `HOSTS` (
   `DOWNTIME` datetime DEFAULT NULL,
   `ALERTSENT` tinyint(1) NOT NULL DEFAULT '0',
   `ALERTTIME` int(3) DEFAULT '5',
-  PRIMARY KEY (`ID`)
+  `SITE` int(11) NOT NULL,
+  `TYPE` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `SITE` (`SITE`),
+  KEY `TYPE` (`TYPE`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+
+--
+-- Table structure for table `HOSTTYPES`
+--
+
+CREATE TABLE IF NOT EXISTS `HOSTTYPES` (
+  `TYPE_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(255) NOT NULL,
+  `MEDIA` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`TYPE_ID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+
+--
+-- Dumping data for table `HOSTTYPES`
+--
+
+INSERT INTO `HOSTTYPES` (`TYPE_ID`, `NAME`, `MEDIA`) VALUES
+(1, 'Access Point', 'accesspoint.png'),
+(2, 'Router', 'router.png'),
+(3, 'Firewall', 'firewall.png'),
+(4, 'Server', 'server.png'),
+(5, 'Switch', 'switch.png'),
+(6, 'PC', 'computer.png'),
+(7, 'Other', 'chip.png');
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `PEOPLES`
@@ -105,11 +135,14 @@ CREATE TABLE IF NOT EXISTS `PEOPLES` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
--- Dumping data for table `PEOPLES`
+-- Table structure for table `SITES`
 --
 
-INSERT INTO `PEOPLES` (`ID`, `NAME`, `PHONENUMBER`, `EMAIL`, `CARRIER`, `PASSWORD`, `USERNAME`) VALUES
-(1, 'Kipster Admin', NULL, NULL, NULL, NULL, 'admin');
+CREATE TABLE IF NOT EXISTS `SITES` (
+  `SITE_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `NAME` varchar(255) NOT NULL,
+  PRIMARY KEY (`SITE_ID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Constraints for dumped tables
@@ -128,6 +161,13 @@ ALTER TABLE `ALERTS`
 ALTER TABLE `HOSTRELATIONS`
   ADD CONSTRAINT `HOSTRELATIONS_ibfk_1` FOREIGN KEY (`ID`) REFERENCES `HOSTS` (`ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `HOSTRELATIONS_ibfk_2` FOREIGN KEY (`PARENT`) REFERENCES `HOSTS` (`ID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `HOSTS`
+--
+ALTER TABLE `HOSTS`
+  ADD CONSTRAINT `HOSTS_ibfk_2` FOREIGN KEY (`TYPE`) REFERENCES `HOSTTYPES` (`TYPE_ID`),
+  ADD CONSTRAINT `HOSTS_ibfk_1` FOREIGN KEY (`SITE`) REFERENCES `SITES` (`SITE_ID`);
 
 --
 -- Constraints for table `PEOPLES`
