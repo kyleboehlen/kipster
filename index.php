@@ -58,6 +58,12 @@ if(!isset($_SESSION['username'])){
           $_SESSION['username'] = $query_fields['USERNAME'];
           $_SESSION['id'] = $query_fields['ID'];
           $_SESSION['name'] = $query_fields['NAME'];
+        }else{
+          $login = true;
+          $username_value = $_POST['username'];
+          $note = "Incorrect Password";
+          $tbs->Show();
+          exit();
         }
       }else{
         if((isset($_POST['password']) && isset($_POST['confirm-password'])) && $_POST['password'] == $_POST['confirm-password']){
@@ -114,6 +120,7 @@ switch($request){
               HOSTS.UP,
               HOSTS.DOWNTIME,
               HOSTS.ALERTTIME,
+              HOSTS.ALERTSENT,
               SITES.NAME AS SITE_NAME,
               HOSTTYPES.MEDIA
               FROM HOSTS INNER JOIN SITES ON SITES.SITE_ID = HOSTS.SITE
@@ -129,10 +136,13 @@ switch($request){
         'type'=>'<img src="media/'.$query_fields['MEDIA'].'" />',
         'name'=>$query_fields['HOST_NAME'],
         'ip'=>$query_fields['IP'],
-        'alerttime'=>$query_fields['ALERTTIME']
+        'sitehighlighting'=>'up-highlighting'
       );
 
-      $das_block[$i]['downtime'] = strlen($query_fields['DOWNTIME'] > 0) ? $query_fields['DOWNTIME'] : 0;
+      $date = date_create($query_fields['DOWNTIME']);
+      $das_block[$i]['downtime'] = strlen($query_fields['DOWNTIME']) > 0 ? $date->format("n/j/Y g:i A") : "N/A";
+      $date->modify('+'.$query_fields['ALERTTIME'].' minutes');
+      $das_block[$i]['alerttime'] = $das_block[$i]['downtime'] == "N/A" ? "N/A" : $date->format("n/j/Y g:i A");
 
       $i++;
     }
@@ -140,6 +150,17 @@ switch($request){
     for($i = 0; $i < sizeof($das_block); $i++){
       $das_block[$i]['htmlsite'] = strtolower(trim(str_replace(" ", "-", $das_block[$i]['site'])));
       $das_block[$i]['highlighting'] = $das_block[$i]['downtime'] > 0 ? 'down-highlighting' : 'up-highlighting';
+    }
+
+    $query = "SELECT SITES.NAME AS SITE_NAME FROM HOSTS INNER JOIN SITES ON SITE = SITE_ID WHERE HOSTS.DOWNTIME IS NOT NULL;";
+    $query_results = mysqli_query($mysqli, $query);
+
+    while($query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC)){
+      for($i = 0; $i < sizeof($das_block); $i++){
+        if($das_block[$i]['site'] == $query_fields['SITE_NAME']){
+          $das_block[$i]['sitehighlighting'] = 'down-highlighting';
+        }
+      }
     }
 
     $tbs->MergeBlock('das_block', $das_block);
