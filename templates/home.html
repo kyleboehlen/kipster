@@ -9,7 +9,7 @@
 		<!--http://paletton.com/#uid=3000u0kefjl7asMb5nzi1e+n5cg-->
 		<script type="text/javascript" src="js/scripts.js"></script>
 	</head>
-	<body>
+	<body onload="hideRows()">
 		[onshow;block=begin; when [var.navbar] == 1]
 			<navbar>
 				<ul>
@@ -40,7 +40,7 @@
 		[onshow;block=end;]
 
 		[onshow;block=begin; when [var.das_table] == 1]
-			<table id="das-table" onload="hideRows()">
+			<table id="das-table">
 				<tr>
 					<th class="min-width"></th>
 					<th>Type</th>
@@ -53,7 +53,7 @@
 					<th onclick="toggleRows(event, '[das_block.htmlsite]')">+</th>
 					<th colspan="5">[das_block.site;block=tr;headergrp=site]</th>
 				</tr>
-				<tr class="[das_block.htmlsite] [das_block.highlighting]">
+				<tr class="[das_block.htmlsite] [das_block.highlighting] hide">
 					<td>[das_block.settings;block=tr;htmlconv=no]</td>
 					<td>[das_block.type;htmlconv=no]</td>
 					<td>[das_block.name]</td>

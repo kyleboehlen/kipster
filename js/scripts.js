@@ -23,3 +23,10 @@ function toggleArray(classRows){
 		}
 	}
 }
+
+function hideRows(){
+	var classRows;
+
+	classRows = document.querySelectorAll('.hide');
+	toggleArray(classRows);
+}
