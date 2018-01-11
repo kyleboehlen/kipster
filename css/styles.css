@@ -1,3 +1,4 @@
+/*****GENERAL********/
 body{
   background-color: #C6D6A6;
 }
@@ -7,6 +8,28 @@ h1{
   font-size: 7em;
   color: #621B1B;
 }
+table{
+  width: 90%;
+  margin-left: 5%;
+  margin-right: 5%;
+  text-align: center;
+}
+table, th, td{
+  border: 5px solid #103B3B;
+  border-collapse: collapse;
+}
+th{
+  font-size: 3em;
+}
+td{
+  font-size: 2em;
+}
+table img{
+  width: 62.5px;
+  height: 62.5px;
+  margin-left: 1%;
+}
+/*****LOGIN/HOME*****/
 #main-note{
   text-align: center;
   font-size: 1.25em;
@@ -71,4 +94,14 @@ navbar li a:hover {
   margin-right: 40%;
   margin-left: 40%;
   height: auto;
+}
+/****DEVICES & SITES***/
+.down-highlighting{
+  background-color: #BC7B7B;
+}
+.up-highlighting{
+  background-color: #9BAF73;
+}
+.min-width{
+  min-width: 100px;
 }

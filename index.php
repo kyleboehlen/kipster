@@ -21,6 +21,8 @@ $login = false;
 $confirm_password = false;
 $navbar = false;
 $logo = false;
+$das_table = false;
+$peoples_table = false;
 
 //declare tbs object and template
 $tbs = new clsTinyButStrong;
@@ -34,7 +36,7 @@ $mysqli = new mysqli("localhost", $database_user, $database_password, "KIPSTER")
 if(!isset($_SESSION['username'])){
   //if username is set, check database for username
   if(isset($_POST['username'])){
-    $query = $mysqli->prepare("SELECT ID, NAME, USERNAME, PASSWORD FROM PEOPLES WHERE USERNAME = ? LIMIT 1;");
+    $query = $mysqli->prepare("SELECT ID, NAME, USERNAME, PASSWORD FROM PEOPLES WHERE USERNAME = ? AND LOGIN_ACTIVE LIMIT 1;");
     $query->bind_param('s', $_POST['username']);
 
     if(!$query->execute()){
@@ -104,8 +106,46 @@ if(isset($_GET['request'])){
 
 switch($request){
   case "das":
+    $das_table = true;
+
+    $query = "SELECT HOSTS.ID AS HOST_ID,
+              HOSTS.NAME AS HOST_NAME,
+              HOSTS.IPADDRESS AS IP,
+              HOSTS.UP,
+              HOSTS.DOWNTIME,
+              HOSTS.ALERTTIME,
+              SITES.NAME AS SITE_NAME,
+              HOSTTYPES.MEDIA
+              FROM HOSTS INNER JOIN SITES ON SITES.SITE_ID = HOSTS.SITE
+              INNER JOIN HOSTTYPES ON HOSTTYPES.TYPE_ID = HOSTS.TYPE
+              ORDER BY SITE_NAME, HOSTTYPES.NAME, HOST_NAME;";
+    $query_results = mysqli_query($mysqli, $query);
+
+    $i = 0;
+    while($query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC)){
+      $das_block[$i] = array(
+        'site'=>$query_fields['SITE_NAME'],
+        'settings'=>'<a href="index.php?request=settings&host-id='.$query_fields['HOST_ID'].'"><img src="media/cogwheel.png" /></a>',
+        'type'=>'<img src="media/'.$query_fields['MEDIA'].'" />',
+        'name'=>$query_fields['HOST_NAME'],
+        'ip'=>$query_fields['IP'],
+        'alerttime'=>$query_fields['ALERTTIME']
+      );
+
+      $das_block[$i]['downtime'] = strlen($query_fields['DOWNTIME'] > 0) ? $query_fields['DOWNTIME'] : 0;
+
+      $i++;
+    }
+
+    for($i = 0; $i < sizeof($das_block); $i++){
+      $das_block[$i]['htmlsite'] = strtolower(trim(str_replace(" ", "-", $das_block[$i]['site'])));
+      $das_block[$i]['highlighting'] = $das_block[$i]['downtime'] > 0 ? 'down-highlighting' : 'up-highlighting';
+    }
+
+    $tbs->MergeBlock('das_block', $das_block);
     break;
-  case "peoples"
+  case "peoples":
+    $peoples_table = true;
     break;
   case "logout":
     session_unset();

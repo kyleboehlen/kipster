@@ -7,9 +7,7 @@
 		<link href="stylesheets/animate.css" rel="stylesheet" />
 		<link href="media/connection.png" rel="icon" />
 		<!--http://paletton.com/#uid=3000u0kefjl7asMb5nzi1e+n5cg-->
-		<script>
-
-		</script>
+		<script type="text/javascript" src="js/scripts.js"></script>
 	</head>
 	<body>
 		[onshow;block=begin; when [var.navbar] == 1]
@@ -39,6 +37,34 @@
 
 		[onshow;block=begin; when [var.logo] == 1]
 			<img id="logo" src="media/connection.png" />
+		[onshow;block=end;]
+
+		[onshow;block=begin; when [var.das_table] == 1]
+			<table id="das-table" onload="hideRows()">
+				<tr>
+					<th class="min-width"></th>
+					<th>Type</th>
+					<th>Name</th>
+					<th>IP Addr.</th>
+					<th>Downtime</th>
+					<th>Alert Time</th>
+				</tr>
+				<tr id="[das_block.htmlsite]" class="[das_block.highlighting]">
+					<th onclick="toggleRows(event, '[das_block.htmlsite]')">+</th>
+					<th colspan="5">[das_block.site;block=tr;headergrp=site]</th>
+				</tr>
+				<tr class="[das_block.htmlsite] [das_block.highlighting]">
+					<td>[das_block.settings;block=tr;htmlconv=no]</td>
+					<td>[das_block.type;htmlconv=no]</td>
+					<td>[das_block.name]</td>
+					<td>[das_block.ip]</td>
+					<td>[das_block.downtime]</td>
+					<td>[das_block.alerttime]</td>
+				</tr>
+			</table>
+		[onshow;block=end;]
+
+		[onshow;block=begin; when [var.peoples_table] == 1]
 		[onshow;block=end;]
 
 
