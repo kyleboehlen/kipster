@@ -10,7 +10,8 @@ session_start();
 
 //require TBS class and fill in vars for template
 require_once('tbs_class.php');
-require("config.php");
+require('kipster_functions.php');
+require('config.php');
 
 //general page vars
 $request = '';
@@ -29,7 +30,7 @@ $tbs = new clsTinyButStrong;
 $tbs->LoadTemplate('templates/home.html');
 
 //database connection
-$mysqli = new mysqli("localhost", $database_user, $database_password, "KIPSTER");
+$mysqli = ConnectDatabase($database_user, $database_password);
 
 ///////////////LOGIN////////////////////////////////
 //if session isn't set check if username was entered
@@ -129,7 +130,26 @@ switch($request){
     $query_results = mysqli_query($mysqli, $query);
 
     $i = 0;
+    $first_site = true;
     while($query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC)){
+      if($first_site){
+        $cur_site = $query_fields['SITE_NAME'];
+        $first_site = false;
+      }
+      if($cur_site != $query_fields['SITE_NAME']){
+        $das_block[$i] = array(
+          'site'=>$cur_site,
+          'settings'=>'<input type="submit" name="add-host" value="Add '.$cur_site.' Host" class="das-form-font" />',
+          'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli)).'</select>',
+          'name'=>'<input type="text" name="host-name" class="das-form-font" />',
+          'ip'=>'<input type="text" name="ip" class="das-form-font" />',
+          'sitehighlighting'=>'up-highlighting',
+          'downtime'=>'N/A',
+          'alerttime'=>'<input type="number" name="alerttime" class="das-form-font num" /> (Minutes)'
+        );
+        $cur_site = $query_fields['SITE_NAME'];
+        $i++;
+      }
       $das_block[$i] = array(
         'site'=>$query_fields['SITE_NAME'],
         'settings'=>'<a href="index.php?request=settings&host-id='.$query_fields['HOST_ID'].'"><img src="media/cogwheel.png" /></a>',
@@ -147,12 +167,47 @@ switch($request){
       $i++;
     }
 
+    $das_block[$i] = array(
+      'site'=>$cur_site,
+      'settings'=>'<input type="submit" name="add-host" value="Add '.$cur_site.' Host" class="das-form-font" />',
+      'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli)).'</select>',
+      'name'=>'<input type="text" name="host-name" class="das-form-font" />',
+      'ip'=>'<input type="text" name="ip" class="das-form-font" />',
+      'sitehighlighting'=>'up-highlighting',
+      'downtime'=>'N/A',
+      'alerttime'=>'<input type="number" name="alerttime" class="das-form-font num" /> (Minutes)'
+    );
+
+    $i++;
+    $query = "SELECT SITES.SITE_ID, SITES.NAME AS SITE_NAME
+              FROM SITES
+              LEFT JOIN HOSTS ON SITES.SITE_ID = HOSTS.SITE
+              WHERE HOSTS.SITE IS NULL;";
+    $query_results = mysqli_query($mysqli, $query);
+
+    while($query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC)){
+      $das_block[$i] = array(
+        'site'=>$query_fields['SITE_NAME'],
+        'settings'=>'<input type="submit" name="add-host" value="Add '.$query_fields['SITE_NAME'].' Host" class="das-form-font" />',
+        'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli)).'</select>',
+        'name'=>'<input type="text" name="host-name" class="das-form-font" />',
+        'ip'=>'<input type="text" name="ip" class="das-form-font" />',
+        'sitehighlighting'=>'up-highlighting',
+        'downtime'=>'N/A',
+        'alerttime'=>'<input type="number" name="alerttime" class="das-form-font num" /> (Minutes)'
+      );
+      $i++;
+    }
+
     for($i = 0; $i < sizeof($das_block); $i++){
       $das_block[$i]['htmlsite'] = strtolower(trim(str_replace(" ", "-", $das_block[$i]['site'])));
       $das_block[$i]['highlighting'] = $das_block[$i]['downtime'] > 0 ? 'down-highlighting' : 'up-highlighting';
     }
 
-    $query = "SELECT SITES.NAME AS SITE_NAME FROM HOSTS INNER JOIN SITES ON SITE = SITE_ID WHERE HOSTS.DOWNTIME IS NOT NULL;";
+    $query = "SELECT SITES.NAME AS SITE_NAME
+              FROM HOSTS
+              INNER JOIN SITES ON SITE = SITE_ID
+              WHERE HOSTS.DOWNTIME IS NOT NULL;";
     $query_results = mysqli_query($mysqli, $query);
 
     while($query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC)){
@@ -164,6 +219,57 @@ switch($request){
     }
 
     $tbs->MergeBlock('das_block', $das_block);
+    break;
+  case "add":
+    if(isset($_GET['type'])){
+      $type = $_GET['type'];
+    }else{
+      $type = "unknown";
+    }
+
+    switch($type){
+      case "das":
+        if(isset($_POST['add-site'])){
+          $query = $mysqli->prepare("INSERT INTO SITES (NAME) VALUES (?);");
+          $query->bind_param("s", $_POST['site-name']);
+        }elseif(isset($_POST['add-host'])){
+          $site = $_POST['add-host'];
+          $site = str_replace("Add", "", $site);
+          $site = str_replace("Host", "", $site);
+          $site = trim($site);
+
+          echo $site; //debug
+
+          $query = $mysqli->prepare("SELECT SITE_ID FROM SITES WHERE NAME = ? LIMIT 1;");
+          $query->bind_param("s", $site);
+          $query->execute();
+          $query_result = $query->get_result();
+
+          $query_fields = mysqli_fetch_array($query_result, MYSQLI_ASSOC);
+
+          echo $query_fields['SITE_ID']; //debug
+          echo $_POST['host-name'];
+          echo $_POST['ip'];
+          echo $_POST['alerttime'];
+          echo $_POST['type'];
+
+          $query = $mysqli->prepare("INSERT INTO HOSTS (NAME, IPADDRESS, ALERTTIME, SITE, TYPE) VALUES (?, ?, ?, ?, ?);");
+          $query->bind_param("ssiii", $_POST['host-name'], $_POST['ip'], $_POST['alerttime'], $query_fields['SITE_ID'], $_POST['type']);
+        }
+        if(!$query->execute()){
+          $note = "Failed to add";
+          $logo = true;
+        }else{
+          header('Location: index.php?request=das');
+        }
+        break;
+      case "person":
+        break;
+      default:
+        $note = "Not quite sure what you were trying to add";
+        $logo = true;
+        break;
+    }
     break;
   case "peoples":
     $peoples_table = true;

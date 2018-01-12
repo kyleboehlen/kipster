@@ -40,28 +40,38 @@
 		[onshow;block=end;]
 
 		[onshow;block=begin; when [var.das_table] == 1]
-			<table id="das-table">
-				<tr>
-					<th class="min-width"></th>
-					<th>Type</th>
-					<th>Name</th>
-					<th>IP Addr.</th>
-					<th>Down Time</th>
-					<th>Alert Time</th>
-				</tr>
-				<tr id="[das_block.htmlsite]" class="[das_block.sitehighlighting]">
-					<th onclick="toggleRows(event, '[das_block.htmlsite]')">+</th>
-					<th colspan="5">[das_block.site;block=tr;headergrp=site]</th>
-				</tr>
-				<tr class="[das_block.htmlsite] [das_block.highlighting] hide">
-					<td>[das_block.settings;block=tr;htmlconv=no]</td>
-					<td>[das_block.type;htmlconv=no]</td>
-					<td>[das_block.name]</td>
-					<td>[das_block.ip]</td>
-					<td>[das_block.downtime]</td>
-					<td>[das_block.alerttime]</td>
-				</tr>
-			</table>
+			<form id="das-form" action="index.php?request=add&type=das" method="post" onsubmit="return confirm('Are you sure?')">
+				<table id="das-table">
+					<tr>
+						<th class="min-width">Actions</th>
+						<th>Type</th>
+						<th>Name</th>
+						<th>IP Addr.</th>
+						<th>Down Time</th>
+						<th>Alert Time</th>
+					</tr>
+					<tr id="[das_block.htmlsite]" class="[das_block.sitehighlighting]">
+						<th onclick="toggleRows(event, '[das_block.htmlsite]')">+</th>
+						<th colspan="5">[das_block.site;block=tr;headergrp=site]</th>
+					</tr>
+					<tr class="[das_block.htmlsite] [das_block.highlighting] hide">
+						<td>[das_block.settings;block=tr;htmlconv=no]</td>
+						<td>[das_block.type;htmlconv=no]</td>
+						<td>[das_block.name;htmlconv=no]</td>
+						<td>[das_block.ip;htmlconv=no]</td>
+						<td>[das_block.downtime]</td>
+						<td>[das_block.alerttime;htmlconv=no]</td>
+					</tr>
+					<tr>
+						<th>
+							<input id="site-submit" type="submit" name="add-site" value="Add Site" />
+						</th>
+						<th colspan="5">
+							<input id="site-add" type="text" name="site-name" value="Site Name" />
+						</th>
+					</tr>
+				</table>
+			</form>
 		[onshow;block=end;]
 
 		[onshow;block=begin; when [var.peoples_table] == 1]

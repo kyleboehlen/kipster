@@ -96,6 +96,9 @@ navbar li a:hover {
   height: auto;
 }
 /****DEVICES & SITES***/
+#das-table{
+  font-family: 'Cairo';
+}
 .down-highlighting{
   background-color: #BC7B7B;
 }
@@ -103,5 +106,25 @@ navbar li a:hover {
   background-color: #9BAF73;
 }
 .min-width{
-  min-width: 100px;
+  min-width: 200px;
+}
+#site-add{
+  width: 100%;
+  font-size: 1em;
+  font-family: 'Cairo';
+}
+#site-submit{
+  width: 100%;
+  font-size: 1em;
+  font-family: 'Cairo';
+  border-radius: 5px;
+  background-color: #6B8A8A;
+}
+.das-form-font{
+  background-color: #6B8A8A;
+  font-size: .75em;
+  font: 'Cairo';
+}
+.num{
+  width: 50px;
 }

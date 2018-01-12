@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 10, 2018 at 01:00 PM
+-- Generation Time: Jan 12, 2018 at 04:22 PM
 -- Server version: 5.5.58-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.22
 
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `HOSTS` (
   PRIMARY KEY (`ID`),
   KEY `SITE` (`SITE`),
   KEY `TYPE` (`TYPE`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `HOSTTYPES`
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `HOSTTYPES` (
   `NAME` varchar(255) NOT NULL,
   `MEDIA` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`TYPE_ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `HOSTTYPES`
@@ -129,10 +129,11 @@ CREATE TABLE IF NOT EXISTS `PEOPLES` (
   `CARRIER` varchar(255) DEFAULT NULL,
   `PASSWORD` text,
   `USERNAME` varchar(255) DEFAULT NULL,
+  `LOGIN_ACTIVE` tinyint(1) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `USERNAME` (`USERNAME`),
   KEY `CARRIER` (`CARRIER`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `SITES`
@@ -141,8 +142,9 @@ CREATE TABLE IF NOT EXISTS `PEOPLES` (
 CREATE TABLE IF NOT EXISTS `SITES` (
   `SITE_ID` int(11) NOT NULL AUTO_INCREMENT,
   `NAME` varchar(255) NOT NULL,
-  PRIMARY KEY (`SITE_ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+  PRIMARY KEY (`SITE_ID`),
+  UNIQUE KEY `NAME` (`NAME`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 --
 -- Constraints for dumped tables
