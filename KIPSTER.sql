@@ -136,6 +136,15 @@ CREATE TABLE IF NOT EXISTS `PEOPLES` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 --
+-- Dumping data for table `HOSTTYPES`
+--
+
+INSERT INTO `PEOPLES` (`ID`, `NAME`, `LOGIN_ACTIVE`) VALUES
+(0, 'admin', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `SITES`
 --
 
