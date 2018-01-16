@@ -128,3 +128,8 @@ navbar li a:hover {
 .num{
   width: 50px;
 }
+/*****HOST SETTINGS*****/
+#host-img{
+  width: 100px;
+  height: 100px;
+}

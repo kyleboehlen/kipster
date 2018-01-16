@@ -23,7 +23,10 @@ $confirm_password = false;
 $navbar = false;
 $logo = false;
 $das_table = false;
-$peoples_table = false;
+$peoples = false;
+$peoples_select = false;
+$peoples_form = false;
+$settings = false;
 
 //declare tbs object and template
 $tbs = new clsTinyButStrong;
@@ -140,7 +143,7 @@ switch($request){
         $das_block[$i] = array(
           'site'=>$cur_site,
           'settings'=>'<input type="submit" name="add-host" value="Add '.$cur_site.' Host" class="das-form-font" />',
-          'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli)).'</select>',
+          'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli), NULL, false).'</select>',
           'name'=>'<input type="text" name="host-name" class="das-form-font" />',
           'ip'=>'<input type="text" name="ip" class="das-form-font" />',
           'sitehighlighting'=>'up-highlighting',
@@ -170,7 +173,7 @@ switch($request){
     $das_block[$i] = array(
       'site'=>$cur_site,
       'settings'=>'<input type="submit" name="add-host" value="Add '.$cur_site.' Host" class="das-form-font" />',
-      'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli)).'</select>',
+      'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli), NULL, false).'</select>',
       'name'=>'<input type="text" name="host-name" class="das-form-font" />',
       'ip'=>'<input type="text" name="ip" class="das-form-font" />',
       'sitehighlighting'=>'up-highlighting',
@@ -189,7 +192,7 @@ switch($request){
       $das_block[$i] = array(
         'site'=>$query_fields['SITE_NAME'],
         'settings'=>'<input type="submit" name="add-host" value="Add '.$query_fields['SITE_NAME'].' Host" class="das-form-font" />',
-        'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli)).'</select>',
+        'type'=>'<select name="type" class="das-form-font">'.ConvertToSelectOps(GetTypeArray($mysqli), NULL, false).'</select>',
         'name'=>'<input type="text" name="host-name" class="das-form-font" />',
         'ip'=>'<input type="text" name="ip" class="das-form-font" />',
         'sitehighlighting'=>'up-highlighting',
@@ -272,7 +275,158 @@ switch($request){
     }
     break;
   case "peoples":
-    $peoples_table = true;
+    $peoples = true;
+
+    if(isset($_GET['peoples-id']) || isset($_POST['peoples-name'])){
+      $peoples_form = true;
+    }elseif(!isset($_POST['id'])){
+      $peoples_select = true;
+    }
+
+    if($peoples_select){
+      $peoples_ops = ConvertToSelectOps(GetPeoplesArray($mysqli), NULL, false);
+    }elseif(isset($_POST['peoples-name'])){
+      $query = $mysqli->prepare("INSERT INTO PEOPLES (NAME, LOGIN_ACTIVE) VALUES(?, 0);");
+      $query->bind_param("s", $_POST['peoples-name']);
+
+      if(!$query->execute()){
+        $logo = true;
+        $note = "Issues adding person.";
+        $tbs->Show();
+        exit();
+      }else{
+        header('Location: index.php?request=peoples&peoples-id='.$mysqli->insert_id);
+      }
+    }elseif(isset($_GET['peoples-id'])){
+      $id = $_GET['peoples-id'];
+      $query = $mysqli->prepare("SELECT ID, NAME, PHONENUMBER, EMAIL, CARRIER, USERNAME, LOGIN_ACTIVE AS LOGIN FROM PEOPLES WHERE ID = ? LIMIT 1;");
+      $query->bind_param("i", $id);
+
+      if(!$query->execute()){
+        $logo = true;
+        $note = "Issues retrieving person.";
+        $tbs->Show();
+        exit();
+      }
+
+      $query_results = $query->get_result();
+
+      $query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC);
+
+      $name = $query_fields['NAME'];
+      $phonenumber = strlen($query_fields['PHONENUMBER']) > 0 ? $query_fields['PHONENUMBER'] : '';
+      $carriers = ConvertToSelectOps(GetCarrierArray($mysqli), $query_fields['CARRIER'], false);
+      $email = strlen($query_fields['EMAIL']) > 0 ? $query_fields['EMAIL'] : '';
+      $username = strlen($query_fields['USERNAME']) > 0 ? $query_fields['USERNAME'] : '';
+      $login = $query_fields['LOGIN'];
+
+    }elseif(isset($_POST['id'])){
+      $id = $_POST['id'];
+      $login_active = isset($_POST['login-active']) ? 1 : 0;
+
+      $query = $mysqli->prepare("UPDATE PEOPLES SET NAME = ?, LOGIN_ACTIVE = ? WHERE ID = ?;");
+      $query->bind_param("sii", $_POST['name'], $login_active, $id);
+      $query->execute();
+
+      if(isset($_POST['phonenumber'])){
+        $query = $mysqli->prepare("UPDATE PEOPLES SET PHONENUMBER = ? WHERE ID = ?;");
+        $query->bind_param("si", $_POST['phonenumber'], $id);
+        $query->execute();
+      }
+      if(isset($_POST['email'])){
+        $query = $mysqli->prepare("UPDATE PEOPLES SET EMAIL = ? WHERE ID = ?;");
+        $query->bind_param("si", $_POST['email'], $id);
+        $query->execute();
+      }
+      if(isset($_POST['carrier'])){
+        $query = $mysqli->prepare("UPDATE PEOPLES SET CARRIER = ? WHERE ID = ?;");
+        $query->bind_param("si", $_POST['carrier'], $id);
+        $query->execute();
+      }
+      if(isset($_POST['username'])){
+        $query = $mysqli->prepare("UPDATE PEOPLES SET USERNAME = ? WHERE ID = ?;");
+        $query->bind_param("si", $_POST['username'], $id);
+        $query->execute();
+      }
+
+      header('Location: index.php?request=peoples&peoples-id='.$id);
+    }else{
+      $logo = true;
+      $note = "Not quite sure what you were trying to do there.";
+      $tbs->Show();
+      exit();
+    }
+    //SHOULD PROBABLY LOOK AT JUST USING A DROPDOWN LIST FOR PEOPLES SETTINGS AND A NORMAL FORM GENERATED
+    break;
+  case "settings":
+    $id = $_GET['host-id'];
+    $settings = true;
+
+    if(!isset($_GET['host-id'])){
+      $logo = true;
+      $tbs->Show();
+      exit();
+    }
+
+    //host info
+    $query = $mysqli->prepare("SELECT HOSTS.NAME AS HOST_NAME, HOSTS.IPADDRESS, HOSTS.ALERTTIME, HOSTS.SITE AS SITE_ID, HOSTS.TYPE AS TYPE_ID, HOSTTYPES.NAME AS TYPE_NAME, HOSTTYPES.MEDIA, PARENT.NAME AS PARENT_NAME, PARENT.ID AS PARENT_ID FROM HOSTS INNER JOIN HOSTTYPES ON HOSTS.TYPE = HOSTTYPES.TYPE_ID LEFT JOIN HOSTRELATIONS ON HOSTS.ID = HOSTRELATIONS.ID LEFT JOIN HOSTS AS PARENT ON HOSTRELATIONS.PARENT = PARENT.ID WHERE HOSTS.ID = ? LIMIT 1;");
+
+    try{
+      $query->bind_param("i", $id);
+    }catch(Exception $e){
+      header('Location: index.php');
+      exit();
+    }
+
+    if(!$query->execute()){
+      $logo = true;
+      $note = "Error finding host";
+      $tbs->Show();
+      exit();
+    }
+
+    $query_results = $query->get_result();
+
+    if(!mysqli_num_rows($query_results) > 0){
+      $logo = true;
+      $note = "Error finding host;";
+      $tbs->Show();
+      exit();
+    }
+
+    $query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC);
+
+    $host_name = $query_fields['HOST_NAME'];
+    $ipaddress = $query_fields['IPADDRESS'];
+    $alerttime = $query_fields['ALERTTIME'];
+
+    $sites = ConvertToSelectOps(GetSitesArray($mysqli), $query_fields['SITE_ID'], true);
+    $types = ConvertToSelectOps(GetTypeArray($mysqli), $query_fields['TYPE_ID'], true);
+
+    $media = $query_fields['MEDIA'];
+
+    //alerts
+    $query = $mysqli->prepare("SELECT PEOPLES.ID AS PEOPLES_ID, PEOPLES.NAME AS PEOPLES_NAME, TEXTALERTS.TEXT, EMAILALERTS.EMAIL FROM PEOPLES LEFT JOIN (SELECT PEOPLESID, TEXT FROM ALERTS WHERE HOSTSID = ? AND TEXT = 1) AS TEXTALERTS ON PEOPLES.ID = TEXTALERTS.PEOPLESID LEFT JOIN (SELECT PEOPLESID, TEXT AS EMAIL FROM ALERTS WHERE HOSTSID = ? AND TEXT = 0) AS EMAILALERTS ON PEOPLES.ID = EMAILALERTS.PEOPLESID WHERE PEOPLES.ID > 0;");
+    $query->bind_param("ii", $id, $id);
+    $query->execute();
+    $query_results = $query->get_result();
+
+    $i = 0;
+    while($query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC)){
+      $text = strlen($query_fields['TEXT']) > 0 ? 1 : 0;
+      $email = strlen($query_fields['EMAIL']) > 0 ? 1 : 0;
+
+      $alerts_array[$i] = array(
+        'peoples_id'=>$query_fields['PEOPLES_ID'],
+        'peoples_name'=>$query_fields['PEOPLES_NAME'],
+        'text'=>$text,
+        'email'=>$email
+      );
+      $i++;
+    }
+
+    $tbs->MergeBlock('alerts_block', $alerts_array);
+
     break;
   case "logout":
     session_unset();

@@ -21,7 +21,8 @@
 			</navbar>
 		[onshow;block=end;]
 
-		<h1>Kipster</h1>
+		[onshow;block=begin; when [var.logo] == 1]<h1>Kipster</h1>[onshow;block=end]
+		[onshow;block=begin; when [var.login] == 1]<h1>Kipster</h1>[onshow;block=end]
 		<p id="main-note">[onshow.note]</p>
 
     [onshow;block=begin; when [var.login] == 1]
@@ -74,9 +75,84 @@
 			</form>
 		[onshow;block=end;]
 
-		[onshow;block=begin; when [var.peoples_table] == 1]
+		[onshow;block=begin; when [var.peoples] == 1]
+			[onshow;block=begin; when [var.peoples_select] == 1]
+				<form id="people-select-form" action="index.php" method="get">
+					<input type="hidden" name="request" value="peoples" />
+					<select name="peoples-id" required>
+						[onshow.peoples_ops;htmlconv=no]
+					</select>
+					<input type="submit" name="Edit" value="Edit" />
+				</form>
+				<form id="people-add-form" action="index.php?request=peoples" method="post">
+					<input type="text" name="peoples-name" required  />
+					<input type="submit" name="Add" value="Add" />
+				</form>
+			[onshow;block=end;]
+			[onshow;block=begin; when [var.peoples_form] == 1]
+				<form id="people-edit-form" action="index.php?request=peoples" method="post">
+					<input type="hidden" name="id" value="[onshow.id]" />
+					Name: <input type="text" name="name" value="[onshow.name]" required/><br />
+					Phone: <input type="tel" name="phonenumber" value="[onshow.phonenumber]" /><br />
+					Carrier: <select name="carrier">
+						[onshow.carriers;htmlconv=no]
+					</select><br />
+					Email: <input type="email" name="email" value="[onshow.email]" /><br />
+					Username: <input type="text" name="username" value="[onshow.username]" /><br />
+					Login Active <input type="checkbox" name="login-active" [onshow; if [var.login] = 1;then 'checked';] /> <br />
+					<input type="submit" name="Update" value="Update" />
+				</form>
+			[onshow;block=end;]
 		[onshow;block=end;]
 
-
+		[onshow;block=begin; when [var.settings] == 1]
+			<img id="host-img" src="media/[onshow.media]" />
+			<h2>[onshow.host_name]</h2>
+			<form id="host-settings-form" action="index.php" method="post">
+				<input type="hidden" name="request" value="settings" /><br />
+				Host Name: <input type="text" name="host-name"	value="[onshow.host_name]" /><br />
+				IP Address: <input type="text" name="ipaddress"	value="[onshow.ipaddress]" /><br />
+				Alert Time (m): <input type="number" name="alerttime"	value="[onshow.alerttime]" min="0" /><br />
+				Site: <select name="site">
+					[onshow.sites;htmlconv=no;]
+				</select><br />
+				Type: <select name="type">
+					[onshow.types;htmlconv=no;]
+				</select><br />
+				<input type="submit" name="Update" value="Update" />
+			</form><br /><br />
+			<form id="host-alerts-form" action="index.php" method="post">
+				<table id="host-alerts-table">
+					<tr>
+						<th colspan="4">Alerts</th>
+					</tr>
+					<tr>
+						<th>Settings</th>
+						<th>Name</th>
+						<th>Text</th>
+						<th>Email</th>
+					</tr>
+					<tr>
+						<td>
+							<a href="index.php?request=peoples&peoples-id=[alerts_block.peoples_id;block=tr;]">
+								<img src="media/cogwheel.png" />
+							</a>
+						</td>
+						<td>[alerts_block.peoples_name;]</td>
+						<td>
+							<input type="checkbox" name="[alerts_block.peoples_id;]-text" [onshow; if [alerts_block.text] = 1;then 'checked';] />
+						</td>
+						<td>
+							<input type="checkbox" name="[alerts_block.peoples_id;]-email" [onshow; if [alerts_block.email] = 1;then 'checked';] />
+						</td>
+					</tr>
+					<tr>
+						<th colspan="4">
+							<input type="submit" name="Save Alerts" value="Save Alerts" />
+						</th>
+					</tr>
+				</table>
+			</form>
+		[onshow;block=end;]
 	</body>
 </html>
