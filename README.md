@@ -14,8 +14,14 @@ Now that kipster is installed, you need to add it to your crontab jobs. Edit cro
 Arrow down to a new line that isn't commented out by a # and add the command:
 <br /><code>*/1 * * * * php -f /var/www/html/kipster/kipster.php</code><br />
 
+# Config
+In the config.php file you will need to add in your database creds, as well as the email/password of the email address that you would like to use to send the alerts. Keep in mind if you use gmail you will have to turn on support for "Less Secure Apps".
+
 # Setting Up Alerts
-Until the GUI is created alerts can be added by directly adding information to the database.
+Using the GUI you can ad
+
+# Database
+Add the database with the included KIPSTER.sql file
 
 # Database Schema
 When adding a host to monitor add values for the NAME column, IPADDRESS, and ALERTTIME (amount of time the host needs to be down before sending an alert) the rest is handled by the script
