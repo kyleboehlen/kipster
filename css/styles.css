@@ -8,6 +8,12 @@ h1{
   font-size: 7em;
   color: #621B1B;
 }
+h2{
+  text-align: center;
+  font-family: 'Macondo Swash Caps';
+  font-size: 3em;
+  color: #621B1B;
+}
 table{
   width: 90%;
   margin-left: 5%;
@@ -123,13 +129,98 @@ navbar li a:hover {
 .das-form-font{
   background-color: #6B8A8A;
   font-size: .75em;
-  font: 'Cairo';
+  font-family: 'Cairo';
 }
 .num{
   width: 50px;
 }
 /*****HOST SETTINGS*****/
 #host-img{
-  width: 100px;
-  height: 100px;
+  width: 10%;
+  height: auto;
+  margin-left: 45%;
+  margin-right: 45%;
+}
+#host-settings-form{
+  color: #621B1B;
+  font-size: 2em;
+  font-family: 'Cairo';
+  width: 40%;
+  margin-left: 5%;
+  float: left;
+  position: fixed;
+}
+#host-settings-form input{
+  color: #621B1B;
+  font-size: .75em;
+  font-family: 'Cairo';
+}
+#host-settings-form select{
+  color: #621B1B;
+  font-size: .75em;
+  font-family: 'Cairo';
+}
+#host-alerts-table{
+  color: #621B1B;
+  font-size: .75em;
+  font-family: 'Cairo';
+  width: 50%;
+  margin-right: 5%;
+  float: right;
+}
+#host-alerts-table td{
+  font-size: 2.5em;
+}
+#host-alerts-table input{
+  color: #621B1B;
+  font-size: 1em;
+  font-family: 'Cairo';
+  width: 100%;
+  height: 100%
+}
+#host-alerts-table input[type="checkbox"]{
+  width: 100%;
+  height: 100%;
+}
+/****PEOPLES*******/
+#people-select-form{
+  width: 40%;
+  margin-right: 30%;
+  margin-left: 30%;
+}
+#people-select-form input, select{
+  width: 40%;
+  color: #621B1B;
+  font-size: 2.5em;
+  font-family: 'Cairo';
+}
+#people-add-form{
+  width: 40%;
+  margin-right: 30%;
+  margin-left: 30%;
+}
+#people-add-form input, select{
+  width: 40%;
+  color: #621B1B;
+  font-size: 2.5em;
+  font-family: 'Cairo';
+}
+#people-edit-form{
+  width: 40%;
+  color: #621B1B;
+  font-size: 2.5em;
+  font-family: 'Cairo';
+  margin-right: 30%;
+  margin-left: 30%;
+}
+#people-edit-form input{
+  color: #621B1B;
+  font-size: .75em;
+  font-family: 'Cairo';
+}
+#people-edit-form input[type="submit"]{
+  width: 100%;
+}
+#people-edit-form select{
+  font-size: .75em;
 }
