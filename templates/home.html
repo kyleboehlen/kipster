@@ -107,12 +107,13 @@
 
 		[onshow;block=begin; when [var.settings] == 1]
 			<img id="host-img" src="media/[onshow.media]" />
-			<h2>[onshow.host_name]</h2>
-			<form id="host-settings-form" action="index.php" method="post">
-				<input type="hidden" name="request" value="settings" /><br />
-				Host Name: <input type="text" name="host-name"	value="[onshow.host_name]" /><br />
-				IP Address: <input type="text" name="ipaddress"	value="[onshow.ipaddress]" /><br />
-				Alert Time (m): <input type="number" name="alerttime"	value="[onshow.alerttime]" min="0" /><br />
+			<h2 class="[onshow.highlighting]">[onshow.host_name]</h2>
+			<form id="host-settings-form" action="index.php?request=settings" method="post">
+				<input type="hidden" name="action" value="host" />
+				<input type="hidden" name="host-id"	value="[onshow.host_id]" />
+				Host Name: <input type="text" name="host-name"	value="[onshow.host_name]" required /><br />
+				IP Address: <input type="text" name="ipaddress"	value="[onshow.ipaddress]" required /><br />
+				Alert Time (m): <input type="number" name="alerttime"	value="[onshow.alerttime]" min="0" required /><br />
 				Site: <select name="site">
 					[onshow.sites;htmlconv=no;]
 				</select><br />
@@ -121,7 +122,9 @@
 				</select><br />
 				<input type="submit" name="Update" value="Update" />
 			</form><br /><br />
-			<form id="host-alerts-form" action="index.php" method="post">
+			<form id="host-alerts-form" action="index.php?request=settings" method="post">
+				<input type="hidden" name="action" value="alerts" />
+				<input type="hidden" name="host-id" value="[onshow.host_id]" />
 				<table id="host-alerts-table">
 					<tr>
 						<th colspan="4">Alerts</th>

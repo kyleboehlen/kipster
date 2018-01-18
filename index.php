@@ -361,16 +361,64 @@ switch($request){
   case "settings":
     $settings = true;
 
+    if(isset($_POST['action']) && isset($_POST['host-id'])){
+      $id = $_POST['host-id'];
+      if($_POST['action'] == "host"){
+        $query = $mysqli->prepare("UPDATE HOSTS SET NAME = ?, IPADDRESS = ?, ALERTTIME = ? WHERE ID = ?;");
+        $query->bind_param("ssii", $_POST['host-name'], $_POST['ipaddress'], $_POST['alerttime'], $id);
+        $query->execute();
+
+        if(isset($_POST['site']) && $_POST['site'] != "NULL"){
+          $query = $mysqli->prepare("UPDATE HOSTS SET SITE = ? WHERE ID = ?;");
+          $query->bind_param("ii", $_POST['site'], $id);
+          $query->execute();
+        }
+
+        if(isset($_POST['type']) && $_POST['type'] != "NULL"){
+          $query = $mysqli->prepare("UPDATE HOSTS SET TYPE = ? WHERE ID = ?;");
+          $query->bind_param("ii", $_POST['type'], $id);
+          $query->execute();
+        }
+      }elseif($_POST['action'] == "alerts"){
+        $query = $mysqli->prepare("DELETE FROM ALERTS WHERE HOSTSID = ?;");
+        $query->bind_param("i", $id);
+        $query->execute();
+
+        $query = "SELECT MAX(ID) AS MAX_ID FROM PEOPLES LIMIT 1;";
+        $query_results = mysqli_query($mysqli, $query);
+        $query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC);
+
+        $max = $query_fields['MAX_ID'];
+
+        for($i = 1; $i <= $max; $i++){
+          if(isset($_POST[$i.'-text'])){
+            $query = $mysqli->prepare("INSERT INTO ALERTS VALUES(?, ?, 1);");
+            $query->bind_param("ii", $id, $i);
+            $query->execute();
+          }
+          if(isset($_POST[$i.'-email'])){
+            $query = $mysqli->prepare("INSERT INTO ALERTS VALUES(?, ?, 0);");
+            $query->bind_param("ii", $id, $i);
+            $query->execute();
+          }
+        }
+      }
+    }
+
     if(!isset($_GET['host-id'])){
-      $logo = true;
-      $tbs->Show();
-      exit();
+      if(isset($id) > 0){
+        header('Location: index.php?request=settings&host-id='.$id);
+      }else{
+        $logo = true;
+        $tbs->Show();
+        exit();
+      }
     }
 
     $id = $_GET['host-id'];
-    
+
     //host info
-    $query = $mysqli->prepare("SELECT HOSTS.NAME AS HOST_NAME, HOSTS.IPADDRESS, HOSTS.ALERTTIME, HOSTS.SITE AS SITE_ID, HOSTS.TYPE AS TYPE_ID, HOSTTYPES.NAME AS TYPE_NAME, HOSTTYPES.MEDIA, PARENT.NAME AS PARENT_NAME, PARENT.ID AS PARENT_ID FROM HOSTS INNER JOIN HOSTTYPES ON HOSTS.TYPE = HOSTTYPES.TYPE_ID LEFT JOIN HOSTRELATIONS ON HOSTS.ID = HOSTRELATIONS.ID LEFT JOIN HOSTS AS PARENT ON HOSTRELATIONS.PARENT = PARENT.ID WHERE HOSTS.ID = ? LIMIT 1;");
+    $query = $mysqli->prepare("SELECT HOSTS.ID AS HOST_ID, HOSTS.NAME AS HOST_NAME, HOSTS.IPADDRESS, HOSTS.ALERTTIME, HOSTS.UP, HOSTS.SITE AS SITE_ID, HOSTS.TYPE AS TYPE_ID, HOSTTYPES.NAME AS TYPE_NAME, HOSTTYPES.MEDIA, PARENT.NAME AS PARENT_NAME, PARENT.ID AS PARENT_ID FROM HOSTS INNER JOIN HOSTTYPES ON HOSTS.TYPE = HOSTTYPES.TYPE_ID LEFT JOIN HOSTRELATIONS ON HOSTS.ID = HOSTRELATIONS.ID LEFT JOIN HOSTS AS PARENT ON HOSTRELATIONS.PARENT = PARENT.ID WHERE HOSTS.ID = ? LIMIT 1;");
 
     try{
       $query->bind_param("i", $id);
@@ -398,6 +446,7 @@ switch($request){
     $query_fields = mysqli_fetch_array($query_results, MYSQLI_ASSOC);
 
     $host_name = $query_fields['HOST_NAME'];
+    $host_id = $query_fields['HOST_ID'];
     $ipaddress = $query_fields['IPADDRESS'];
     $alerttime = $query_fields['ALERTTIME'];
 
@@ -405,6 +454,7 @@ switch($request){
     $types = ConvertToSelectOps(GetTypeArray($mysqli), $query_fields['TYPE_ID'], true);
 
     $media = $query_fields['MEDIA'];
+    $highlighting = $query_fields['UP'] > 0 ? "up-highlighting" : "down-highlighting";
 
     //alerts
     $query = $mysqli->prepare("SELECT PEOPLES.ID AS PEOPLES_ID, PEOPLES.NAME AS PEOPLES_NAME, TEXTALERTS.TEXT, EMAILALERTS.EMAIL FROM PEOPLES LEFT JOIN (SELECT PEOPLESID, TEXT FROM ALERTS WHERE HOSTSID = ? AND TEXT = 1) AS TEXTALERTS ON PEOPLES.ID = TEXTALERTS.PEOPLESID LEFT JOIN (SELECT PEOPLESID, TEXT AS EMAIL FROM ALERTS WHERE HOSTSID = ? AND TEXT = 0) AS EMAILALERTS ON PEOPLES.ID = EMAILALERTS.PEOPLESID WHERE PEOPLES.ID > 0;");
